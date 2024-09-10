@@ -29,7 +29,13 @@ namespace rc {
         int mov[10000] = {};
         std::string base = "A3Bn@op=q1rOPClm2Q0Rst4u!vwE&Fghij7kTGHI6J$a/bcd5ef-UVW)Yx8yzKL9M_NSDZ.+(;";
 
-        _inline auto setupMov() -> void {
+
+        auto xorStr(const std::wstring& input) -> std::wstring {
+            std::wstring output = input;
+            for (wchar_t& c : output) { c ^= 'q'; }
+            return output;
+        }
+        auto setupMov() -> void {
             for (unsigned int sa = 0; sa < 10000; sa++) {
                 mov[sa] = 1;
                 mov[sa + 1] = 2;
@@ -37,25 +43,15 @@ namespace rc {
             }
             setuped = true;
         }
-        _inline auto getSpace(const std::string& input) -> std::string {
+        auto getSpace(const std::string& input) -> std::string {
             std::string result = input;
-            for (char& c : result) {
-                if (c == ' ') { c = '_'; }
-            }
+            for (char& c : result) { if (c == ' ') { c = '_'; } }
             return result;
         }
-        _inline auto setSpace(const std::string& input) -> std::string {
+        auto setSpace(const std::string& input) -> std::string {
             std::string result = input;
-            for (char& c : result) {
-                if (c == '_') { c = ' '; }
-            }
+            for (char& c : result) { if (c == '_') { c = ' '; } }
             return result;
-        }
-
-        auto xorStr(const std::wstring& input) -> std::wstring {
-            std::wstring output = input;
-            for (wchar_t& c : output) { c ^= 'q'; }
-            return output;
         }
         auto encStr(std::string& input) -> std::string {
             if (setuped == false) { setupMov(); }
@@ -96,6 +92,7 @@ namespace rc {
             }
             return setSpace(std::string(word.begin(), word.end()));
         }
+        
     }
     namespace random {
         std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -263,4 +260,16 @@ namespace rc {
             return result == TRUE;
         }
     }
+}
+
+
+int main() {
+    std::string text = "hello world!";
+    rc::crypt::cryptConfig foo;
+
+    std::cout << text << std::endl;
+    foo.
+
+
+    system("pause");
 }
