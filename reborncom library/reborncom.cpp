@@ -17,52 +17,7 @@
 #pragma comment(lib, "wininet.lib")
 
 
-class rccryptclass final {
-public:
-    _inline auto getSetuped() -> bool { return this->setuped; }
-    _inline auto getAllowXor() -> bool { return this->allowXor; }
-    _inline auto setSetuped(bool val) -> bool { return this->setuped = val; }
-    _inline auto getMov(int index) -> int { return this->mov[index]; }
-    _inline auto setMov(int index, int val) -> int { return this->mov[index] = val; }
-    _inline auto getBase(int index) -> const char { return this->base[index]; }
-    _inline auto getBaseLenght() -> int { return this->base.length(); }
-    _inline auto setupMov() -> void {
-        for (unsigned int sa = 0; sa < 10000; sa++) {
-            this->mov[sa] = 1;
-            this->mov[sa + 1] = 2;
-            sa = sa + 1;
-        }
-        this->setuped = true;
-    }
-    _inline auto getSpace(const std::string& input) -> std::string {
-        std::string result = input;
-        for (char& c : result) {
-            if (c == ' ') { c = '_'; }
-        }
-        return result;
-    }
-    _inline auto setSpace(const std::string& input) -> std::string {
-        std::string result = input;
-        for (char& c : result) {
-            if (c == '_') { c = ' '; }
-        }
-        return result;
-    }
-
-private:
-    bool setuped = false;
-    int mov[10000] = {};
-    std::string base = "A3Bn@op=q1rOPClm2Q0Rst4u!vwE&Fghij7kTGHI6J$a/bcd5ef-UVW)Yx8yzKL9M_NSDZ.+(;";
-private:
-    bool allowXor = false;
-
-} cryptclass;
-class rcrandomclass final {
-public:
-    _inline auto getCharacters() -> std::string { return this->characters; }
-private:
-    std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-} randomclass; std::random_device rd;
+std::random_device rd;
 time_t t = time(nullptr);
 tm* now = localtime(&t);
 
@@ -70,26 +25,51 @@ tm* now = localtime(&t);
 
 namespace rc {
     namespace crypt {
+        bool setuped = false;
+        int mov[10000] = {};
+        std::string base = "A3Bn@op=q1rOPClm2Q0Rst4u!vwE&Fghij7kTGHI6J$a/bcd5ef-UVW)Yx8yzKL9M_NSDZ.+(;";
+
+        _inline auto setupMov() -> void {
+            for (unsigned int sa = 0; sa < 10000; sa++) {
+                mov[sa] = 1;
+                mov[sa + 1] = 2;
+                sa = sa + 1;
+            }
+            setuped = true;
+        }
+        _inline auto getSpace(const std::string& input) -> std::string {
+            std::string result = input;
+            for (char& c : result) {
+                if (c == ' ') { c = '_'; }
+            }
+            return result;
+        }
+        _inline auto setSpace(const std::string& input) -> std::string {
+            std::string result = input;
+            for (char& c : result) {
+                if (c == '_') { c = ' '; }
+            }
+            return result;
+        }
+
         auto xorStr(const std::wstring& input) -> std::wstring {
             std::wstring output = input;
-            if (cryptclass.getAllowXor()) {
-                for (wchar_t& c : output) { c ^= 'q'; }
-            }
+            for (wchar_t& c : output) { c ^= 'q'; }
             return output;
         }
         auto encStr(std::string& input) -> std::string {
-            if (cryptclass.getSetuped() == false) { cryptclass.setupMov(); }
+            if (setuped == false) { setupMov(); }
 
-            std::string text = cryptclass.getSpace(input);
+            std::string text = getSpace(input);
             std::vector<char> word(text.begin(), text.end());
-            int baseLength = cryptclass.getBaseLenght();
+            int baseLength = base.length();
 
             for (int input_words = 0; input_words < text.length(); input_words++) {
                 if (word[input_words] == ' ') { continue; }
                 for (int base_words = 0; base_words < baseLength; base_words++) {
-                    if (word[input_words] == cryptclass.getBase(base_words)) {
-                        int mov_size = (base_words + cryptclass.getMov(input_words)) % baseLength;
-                        word[input_words] = cryptclass.getBase(mov_size);
+                    if (word[input_words] == base[base_words]) {
+                        int mov_size = (base_words + mov[input_words]) % baseLength;
+                        word[input_words] = base[mov_size];
                         break;
                     }
                 }
@@ -97,39 +77,41 @@ namespace rc {
             return std::string(word.begin(), word.end());
         }
         auto decStr(std::string& input) -> std::string {
-            if (cryptclass.getSetuped() == false) { cryptclass.setupMov(); }
+            if (setuped == false) { setupMov(); }
 
             std::string text = std::string(input.begin(), input.end());
             std::vector<char> word(text.begin(), text.end());
-            int baseLength = cryptclass.getBaseLenght();
+            int baseLength = base.length();
 
             for (int input_words = 0; input_words < text.length(); input_words++) {
                 if (word[input_words] == ' ') { continue; }
                 for (int base_words = 0; base_words < baseLength; base_words++) {
 
-                    if (word[input_words] == cryptclass.getBase(base_words)) {
-                        int mov_size = (base_words - cryptclass.getMov(input_words)) % baseLength;
-                        word[input_words] = cryptclass.getBase(mov_size);
+                    if (word[input_words] == base[base_words]) {
+                        int mov_size = (base_words - mov[input_words]) % baseLength;
+                        word[input_words] = base[mov_size];
                         break;
                     }
                 }
             }
-            return cryptclass.setSpace(std::string(word.begin(), word.end()));
+            return setSpace(std::string(word.begin(), word.end()));
         }
     }
     namespace random {
+        std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
         auto genWstr(unsigned int length) -> std::wstring {
             std::mt19937 gen(rd());
-            std::uniform_int_distribution<int> dist(0, randomclass.getCharacters().length());
+            std::uniform_int_distribution<int> dist(0, characters.length());
             std::wstring randomString;
-            for (int i = 0; i < length; ++i) { randomString += randomclass.getCharacters()[dist(gen)]; }
+            for (int i = 0; i < length; ++i) { randomString += characters[dist(gen)]; }
             return randomString;
         }
         auto genStr(unsigned int length) -> std::string {
             std::mt19937 gen(rd());
-            std::uniform_int_distribution<int> dist(0, randomclass.getCharacters().length());
+            std::uniform_int_distribution<int> dist(0, characters.length());
             std::string randomString;
-            for (int i = 0; i < length; ++i) { randomString += randomclass.getCharacters()[dist(gen)]; }
+            for (int i = 0; i < length; ++i) { randomString += characters[dist(gen)]; }
             return randomString;
         }
         auto genWstrByAlphabet(std::wstring alphabet, unsigned int length) -> std::wstring {
