@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35122.118
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reborncom library", "reborncom library\reborncom library.vcxproj", "{7FCE1174-878B-4776-A57B-A6C215454FF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7FCE1174-878B-4776-A57B-A6C215454FF8}.Release|x64.ActiveCfg = Release|x64
+		{7FCE1174-878B-4776-A57B-A6C215454FF8}.Release|x64.Build.0 = Release|x64
+		{7FCE1174-878B-4776-A57B-A6C215454FF8}.Release|x86.ActiveCfg = Release|Win32
+		{7FCE1174-878B-4776-A57B-A6C215454FF8}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {07B97952-21D9-41AB-BA37-8706E47E1EA6}
+	EndGlobalSection
+EndGlobal
