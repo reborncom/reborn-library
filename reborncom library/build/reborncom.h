@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <Windows.h>
+#include <cstdint>
 
 
 namespace rc {
@@ -17,12 +19,12 @@ namespace rc {
 
 
 namespace rc {
-    namespace crypt {
+    namespace cryptsys {
         auto xorStr(const std::wstring& input) -> std::wstring;
         auto encStr(std::string& input) -> std::string;
         auto decStr(std::string& input) -> std::string;
     }
-    namespace random {
+    namespace randsys {
         auto genWstr(unsigned int length) -> std::wstring;
         auto genStr(unsigned int length) -> std::string;
         auto genWstrByAlphabet(std::wstring alphabet, unsigned int length) -> std::wstring;
@@ -56,7 +58,7 @@ namespace rc {
         auto dirDelete(const std::string path) -> bool;
         auto dirClear(const std::string path) -> bool;
     }
-    namespace network {
+    namespace netsys {
         auto isInternetConnected() -> bool;
         auto isDomainResponding(const std::wstring domain) -> bool;
     }
@@ -66,5 +68,20 @@ namespace rc {
         auto getModHandle(const std::wstring& moduleName) -> uintptr_t;
         template<typename TYPE> auto write(uintptr_t address, TYPE value) -> bool;
         template<typename TYPE = uintptr_t> auto read(uintptr_t address) -> TYPE;
+    }
+    namespace colsys {
+        enum class setcol : uint8_t;
+        namespace colored_cout_impl {
+            inline uint16_t getConsoleTextAttr();
+            inline void setConsoleTextAttr(const uint16_t attr);
+        }
+        template <typename type> type& operator<<(type& ostream, const setcol color);
+    }
+    namespace logsys {
+        auto printLog(const std::string tag, const colsys::setcol color, const std::string text) -> void;
+        auto infoLog(const std::string text) -> void;
+        auto warningLog(const std::string text) -> void;
+        auto goodLog(const std::string text) -> void;
+        auto errorLog(const std::string text) -> void;
     }
 }

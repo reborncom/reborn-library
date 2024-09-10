@@ -11,10 +11,13 @@
 #include <iomanip>
 #include <shlobj_core.h>
 #include <filesystem>
+#include <cstdint>
 #include <cassert>
 #include <codecvt>
+#include <source_location>
 #include <wininet.h>
 #pragma comment(lib, "wininet.lib")
+
 
 
 std::random_device rd;
@@ -24,7 +27,7 @@ tm* now = localtime(&t);
 
 
 namespace rc {
-    namespace crypt {
+    namespace cryptsys {
         bool setuped = false;
         int mov[10000] = {};
         std::string base = "A3Bn@op=q1rOPClm2Q0Rst4u!vwE&Fghij7kTGHI6J$a/bcd5ef-UVW)Yx8yzKL9M_NSDZ.+(;";
@@ -94,7 +97,7 @@ namespace rc {
         }
         
     }
-    namespace random {
+    namespace randsys {
         std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         auto genWstr(unsigned int length) -> std::wstring {
@@ -228,7 +231,7 @@ namespace rc {
         }
         auto formattedDate(bool returnText = false) -> std::string {
             if (returnText) return getMonth(true) + " " + getDay() + ", " + getYear(); 
-            return getMonth(false) + ", " + getDay() + ", " + getYear();
+            return getDay() + "." + getMonth(false) + "." + getYear();
         }
         auto formattedTime(bool showSeconds = true) -> std::string {
             return getHour() + ":" + getMinute() + (showSeconds ? (":" + getSecond()) : (""));
@@ -289,7 +292,7 @@ namespace rc {
             return false;
         }
     }
-    namespace network {
+    namespace netsys {
         auto isInternetConnected() -> bool {
             BOOL result = InternetCheckConnection(L"https://www.google.com/", FLAG_ICC_FORCE_CONNECTION, 0);
             return result == TRUE;
@@ -357,13 +360,96 @@ namespace rc {
             return 0;
         }
     }
+    namespace colsys {
+        enum class setcol : uint8_t {
+            p_blue = 0x0001,
+            p_green = 0x0002,
+            p_red = 0x0004,
+            p_light = 0x0008,
+
+
+
+            grey = p_blue | p_green | p_red,
+            red = p_red | p_light,
+            green = p_green | p_light,
+            blue = p_blue | p_light,
+            yellow = p_green | p_red | p_light,
+            orange = p_red | p_green,
+            purple = p_red | p_blue,
+
+            
+            white = 15,
+            reset = 0xFF,
+        };
+        namespace colored_cout_impl {
+            inline uint16_t getConsoleTextAttr() {
+                CONSOLE_SCREEN_BUFFER_INFO buffer_info;
+                GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &buffer_info);
+                return buffer_info.wAttributes;
+            }
+            inline void setConsoleTextAttr(const uint16_t attr) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), attr);
+            }
+        }
+        template <typename type> type& operator<<(type& ostream, const setcol color) {
+            static const uint16_t initial_attributes = static_cast<uint16_t>(setcol::grey);
+            static uint16_t background = initial_attributes & 0x00F0;
+            static uint16_t foreground = initial_attributes & 0x000F;
+            if (color == setcol::reset) {
+                ostream.flush();
+                colored_cout_impl::setConsoleTextAttr(initial_attributes);
+                background = initial_attributes & 0x00F0;
+                foreground = initial_attributes & 0x000F;
+            }
+            else {
+                uint16_t set = 0;
+                const uint16_t colorCode = static_cast<uint16_t>(color);
+                if (colorCode & 0x00F0) { background = colorCode; set = background | foreground; }
+                else if (colorCode & 0x000F) { foreground = colorCode; set = background | foreground; }
+                ostream.flush();
+                colored_cout_impl::setConsoleTextAttr(set);
+
+            }
+            return ostream;
+        }
+    }
+    namespace logsys {
+        bool first = true;
+
+        auto printLog(const std::string tag, const colsys::setcol color, const std::string text) -> void {
+            std::string timeTab = "[" + timesys::formattedDate(false) + " " + timesys::formattedTime() + "]";
+            std::string tagTab = "[" + tag + "]";
+
+            if (first) { std::cout << std::endl; first = false; }
+
+            std::cout << timeTab << " " << color << tagTab << " " << colsys::setcol::reset << text << std::endl;
+        }
+        auto infoLog(const std::string text) -> void {
+            rc::logsys::printLog("INFO", rc::colsys::setcol::white, text);
+        }
+        auto warningLog(const std::string text) -> void {
+            rc::logsys::printLog("WARNING", rc::colsys::setcol::orange, text);
+        }
+        auto errorLog(const std::string text) -> void {
+            rc::logsys::printLog("ERROR", rc::colsys::setcol::red, text);
+        }
+        auto goodLog(const std::string text) -> void {
+            rc::logsys::printLog("GOOD", rc::colsys::setcol::green, text);
+        }
+    }
 }
 
-
-int main() {
-    
-    std::cout << rc::timesys::formattedDate(true) << std::endl;
-    std::cout << rc::timesys::formattedTime() << std::endl;
-
-    system("pause");
-}
+//auto sourceLoc = std::source_location::current();
+//
+//int main() {
+//
+//    rc::logsys::printLog("INFO", rc::colsys::setcol::white, "info log");
+//    Sleep(500);
+//    rc::logsys::printLog("WARNING", rc::colsys::setcol::orange, "warning log");
+//    Sleep(500);
+//    rc::logsys::printLog("ERROR", rc::colsys::setcol::red, "error log");
+//    Sleep(500);
+//    rc::logsys::printLog("GOOD", rc::colsys::setcol::green, "good log");
+//
+//    system("pause");
+//}
