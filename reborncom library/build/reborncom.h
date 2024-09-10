@@ -78,6 +78,7 @@ namespace rc {
         template <typename type> type& operator<<(type& ostream, const setcol color);
     }
     namespace logsys {
+        auto setupLogPath(std::string path) -> void;
         auto printLog(const std::string tag, const colsys::setcol color, const std::string text) -> void;
         auto infoLog(const std::string text) -> void;
         auto warningLog(const std::string text) -> void;

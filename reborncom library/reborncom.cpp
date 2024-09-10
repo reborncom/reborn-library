@@ -415,12 +415,21 @@ namespace rc {
     }
     namespace logsys {
         bool first = true;
+        std::string logPath = strsys::getDesktopPath();
 
+        auto setupLogPath(std::string path) -> void {
+            logPath = path;
+        }
         auto printLog(const std::string tag, const colsys::setcol color, const std::string text) -> void {
-            std::string timeTab = "[" + timesys::formattedDate(false) + " " + timesys::formattedTime() + "]";
+            std::string fileName = timesys::formattedDate(false) + ".log";
+            std::string filePath = logPath + fileName;
+            std::string timeTab = "[" + timesys::formattedTime() + "]";
             std::string tagTab = "[" + tag + "]";
 
             if (first) { std::cout << std::endl; first = false; }
+
+            if (!filesys::fileExists(filePath)) filesys::fileCreate(filePath);
+            filesys::fileWrite(filePath, timeTab + " " + tagTab + " " + text);
 
             std::cout << timeTab << " " << color << tagTab << " " << colsys::setcol::reset << text << std::endl;
         }
@@ -440,7 +449,7 @@ namespace rc {
 }
 
 //auto sourceLoc = std::source_location::current();
-//
+
 //int main() {
 //
 //    rc::logsys::printLog("INFO", rc::colsys::setcol::white, "info log");
