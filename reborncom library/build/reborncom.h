@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
+#include <vector>
 
 
 namespace rc {
     namespace types {
+        typedef unsigned __int64    address;
         typedef unsigned __int64    rcptr;
         typedef unsigned __int64    rcsize;
         typedef __int64             rcptrdiff;
@@ -57,5 +59,12 @@ namespace rc {
     namespace network {
         auto isInternetConnected() -> bool;
         auto isDomainResponding(const std::wstring domain) -> bool;
+    }
+    namespace memsys {
+        auto findPattern(uintptr_t startAddress, uintptr_t endAddress, const std::string& patternStr, bool extractAddress, bool extractOffset, int offsetPosition) -> uintptr_t;
+        auto hexToByte(const std::string& hexStr, std::vector<uint8_t>& byteArray) -> bool;
+        auto getModHandle(const std::wstring& moduleName) -> uintptr_t;
+        template<typename TYPE> auto write(uintptr_t address, TYPE value) -> bool;
+        template<typename TYPE = uintptr_t> auto read(uintptr_t address) -> TYPE;
     }
 }

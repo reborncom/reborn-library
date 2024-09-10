@@ -181,9 +181,29 @@ namespace rc {
             oss << std::setw(4) << std::setfill('0') << (now->tm_year + 1900);
             return oss.str();
         }
-        auto getMonth() -> std::string {
+        auto getMonth(bool returnText = false) -> std::string {
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << (now->tm_mon + 1);
+
+            if (returnText) {
+                static const std::string months[] = {
+                    "Invalid",      
+                    "January",      
+                    "February",     
+                    "March",        
+                    "April",        
+                    "May",          
+                    "June",         
+                    "July",         
+                    "August",       
+                    "September",    
+                    "October",      
+                    "November",     
+                    "December"      
+                };
+                return months[std::stoi(oss.str())];
+            }
+
             return oss.str();
         }
         auto getDay() -> std::string {
@@ -205,6 +225,13 @@ namespace rc {
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << now->tm_sec;
             return oss.str();
+        }
+        auto formattedDate(bool returnText = false) -> std::string {
+            if (returnText) return getMonth(true) + " " + getDay() + ", " + getYear(); 
+            return getMonth(false) + ", " + getDay() + ", " + getYear();
+        }
+        auto formattedTime(bool showSeconds = true) -> std::string {
+            return getHour() + ":" + getMinute() + (showSeconds ? (":" + getSecond()) : (""));
         }
     }
     namespace filesys {
@@ -272,12 +299,71 @@ namespace rc {
             return result == TRUE;
         }
     }
+    namespace memsys {
+        template<typename TYPE> auto read(uintptr_t address = 0) -> TYPE {
+            if (!address) return TYPE(); 
+            else if (address < 0xffffff) return TYPE(); 
+            else if (address > 0x7fffffff0000) return TYPE(); 
+            else return *reinterpret_cast<TYPE*>(address); 
+        }
+        template<typename TYPE> auto write(uintptr_t address, TYPE value) -> bool {
+            *reinterpret_cast<TYPE*>(address) = value;
+            return true;
+        }
+        auto getModHandle(const std::wstring& moduleName) -> uintptr_t {
+            return reinterpret_cast<uintptr_t>(GetModuleHandleW(moduleName.c_str()));
+        }
+        auto hexToByte(const std::string& hexStr, std::vector<uint8_t>& byteArray) -> bool {
+            byteArray.clear();
+            size_t len = hexStr.length();
+            for (size_t i = 0; i < len; i += 3) {
+                std::string ByteString = hexStr.substr(i, 2);
+                if (ByteString == "??" || ByteString == "?? ") byteArray.push_back(0);
+                else {
+                    char* End;
+                    long byte = std::strtol(ByteString.c_str(), &End, 16);
+                    if (*End != 0)  return false;
+                    byteArray.push_back(static_cast<uint8_t>(byte));
+                }
+            }
+
+            return true;
+        }
+        auto findPattern(uintptr_t startAddress, uintptr_t endAddress, const std::string& patternStr, bool extractAddress, bool extractOffset, int offsetPosition) -> uintptr_t {
+            std::vector<uint8_t> patternBytes;
+            if (!hexToByte(patternStr, patternBytes)) return 0;
+
+            uintptr_t rangeEnd = endAddress - patternBytes.size();
+            for (uintptr_t addr = startAddress; addr <= rangeEnd; ++addr) {
+                bool match = true;
+                for (size_t i = 0; i < patternBytes.size(); ++i) {
+                    if (patternBytes[i] == 0x00) continue;
+                    if (*(uint8_t*)(addr + i) != patternBytes[i]) {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match) {
+                    if (extractAddress) {
+                        auto relativeOffset = *reinterpret_cast<int32_t*>(addr + offsetPosition);
+                        return addr + 7 + relativeOffset;
+                    }
+                    if (extractOffset) return *reinterpret_cast<int32_t*>(addr + offsetPosition);
+                    return addr;
+                }
+            }
+
+            return 0;
+        }
+    }
 }
 
 
 int main() {
     
-    std::cout << rc::timesys::getMonth();
+    std::cout << rc::timesys::formattedDate(true) << std::endl;
+    std::cout << rc::timesys::formattedTime() << std::endl;
 
     system("pause");
 }
