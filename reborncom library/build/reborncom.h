@@ -38,12 +38,12 @@ namespace rc {
         auto wstrToStr(std::wstring input) -> std::string;
     }
     namespace timesys {
-        auto getYear() -> unsigned int;
-        auto getMonth() -> unsigned int;
-        auto getDay() -> unsigned int;
-        auto getHour() -> unsigned int;
-        auto getMinute() -> unsigned int;
-        auto getSecond() -> unsigned int;
+        auto getYear() -> std::string;
+        auto getMonth() -> std::string;
+        auto getDay() -> std::string;
+        auto getHour() -> std::string;
+        auto getMinute() -> std::string;
+        auto getSecond() -> std::string;
     }
     namespace filesys {
         auto fileExists(const std::string path) -> bool;

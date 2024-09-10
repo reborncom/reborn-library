@@ -176,23 +176,35 @@ namespace rc {
         }
     }
     namespace timesys {
-        auto getYear() -> unsigned int {
-            return now->tm_year + 1900;
+        auto getYear() -> std::string {
+            std::ostringstream oss;
+            oss << std::setw(4) << std::setfill('0') << (now->tm_year + 1900);
+            return oss.str();
         }
-        auto getMonth() -> unsigned int {
-            return now->tm_mon + 1;
+        auto getMonth() -> std::string {
+            std::ostringstream oss;
+            oss << std::setw(2) << std::setfill('0') << (now->tm_mon + 1);
+            return oss.str();
         }
-        auto getDay() -> unsigned int {
-            return now->tm_mday;
+        auto getDay() -> std::string {
+            std::ostringstream oss;
+            oss << std::setw(2) << std::setfill('0') << now->tm_mday;
+            return oss.str();
         }
-        auto getHour() -> unsigned int {
-            return now->tm_hour;
+        auto getHour() -> std::string {
+            std::ostringstream oss;
+            oss << std::setw(2) << std::setfill('0') << now->tm_hour;
+            return oss.str();
         }
-        auto getMinute() -> unsigned int {
-            return now->tm_min;
+        auto getMinute() -> std::string {
+            std::ostringstream oss;
+            oss << std::setw(2) << std::setfill('0') << now->tm_min;
+            return oss.str();
         }
-        auto getSecond() -> unsigned int {
-            return now->tm_sec;
+        auto getSecond() -> std::string {
+            std::ostringstream oss;
+            oss << std::setw(2) << std::setfill('0') << now->tm_sec;
+            return oss.str();
         }
     }
     namespace filesys {
@@ -264,12 +276,8 @@ namespace rc {
 
 
 int main() {
-    std::string text = "hello world!";
-    rc::crypt::cryptConfig foo;
-
-    std::cout << text << std::endl;
-    foo.
-
+    
+    std::cout << rc::timesys::getMonth();
 
     system("pause");
 }
