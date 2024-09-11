@@ -325,6 +325,9 @@ namespace rc {
         }
     }
     namespace memsys {
+        auto _fastcall disableThreadCalls(HMODULE& moduleHandle) -> void {
+            DisableThreadLibraryCalls(moduleHandle);
+        }
         template<typename TYPE> auto read(uintptr_t address = 0) -> TYPE {
             if (!address) return TYPE(); 
             else if (address < 0xffffff) return TYPE(); 
@@ -335,8 +338,11 @@ namespace rc {
             *reinterpret_cast<TYPE*>(address) = value;
             return true;
         }
-        auto getModHandle(const std::wstring& moduleName) -> uintptr_t {
+        auto getModPtr(const std::wstring& moduleName) -> uintptr_t {
             return reinterpret_cast<uintptr_t>(GetModuleHandleW(moduleName.c_str()));
+        }
+        auto getModHandle(const std::wstring& moduleName) -> HMODULE {
+            return GetModuleHandleW(moduleName.c_str());
         }
         auto hexToByte(const std::string& hexStr, std::vector<uint8_t>& byteArray) -> bool {
             byteArray.clear();
