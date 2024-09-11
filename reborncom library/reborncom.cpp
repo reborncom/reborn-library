@@ -381,6 +381,7 @@ namespace rc {
 
             return 0;
         }
+      
     }
     namespace colsys {
         namespace colored_cout_impl {

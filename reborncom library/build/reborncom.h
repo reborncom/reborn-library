@@ -12,6 +12,7 @@ namespace rc {
         typedef unsigned __int64    rcsize;
         typedef __int64             rcptrdiff;
         typedef std::string         rcstring;
+        typedef std::wstring        rcwstring;
         typedef unsigned int        rcuint;
     }
 }
@@ -68,6 +69,28 @@ namespace rc {
         auto getModHandle(const std::wstring& moduleName) -> uintptr_t;
         template<typename TYPE> auto write(uintptr_t address, TYPE value) -> bool;
         template<typename TYPE = uintptr_t> auto read(uintptr_t address) -> TYPE;
+
+        struct rcmodule {
+            std::wstring name;
+            uintptr_t address, end;
+            size_t size;
+
+            constexpr rcmodule() : name(L"invalid"), address(0), end(0), size(0) { }
+            constexpr rcmodule(std::wstring modName) : name(modName), address(0), end(0), size(0) { }
+
+            bool process() {
+                this->address = getModHandle(this->name);
+                if (this->address == 0) return false;
+
+                auto dosH = reinterpret_cast<IMAGE_DOS_HEADER*>(this->address);
+                auto ntH = reinterpret_cast<IMAGE_NT_HEADERS*>(this->address + dosH->e_lfanew);
+
+                this->size = ntH->OptionalHeader.SizeOfImage;
+                if (this->size == 0) return false;
+
+                this->end = this->address + this->size;
+            }
+        };
     }
     namespace colsys {
         enum class setcol : uint8_t {
