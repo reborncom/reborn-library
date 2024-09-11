@@ -48,7 +48,7 @@
     <OutDir>$(SolutionDir)$(MSBuildProjectName)\build</OutDir>
     <IntDir>$(SolutionDir)obj</IntDir>
     <IncludePath>.\;$(IncludePath)</IncludePath>
-    <TargetName>reborncom-x64$(TargetExt)</TargetName>
+    <TargetName>reborncom-x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(MSBuildProjectName)\build</OutDir>

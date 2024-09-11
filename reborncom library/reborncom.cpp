@@ -21,8 +21,6 @@
 
 
 std::random_device rd;
-time_t t = time(nullptr);
-tm* now = localtime(&t);
 
 
 
@@ -180,11 +178,17 @@ namespace rc {
     }
     namespace timesys {
         auto getYear() -> std::string {
+            time_t t = time(nullptr);
+            tm* now = localtime(&t);
+
             std::ostringstream oss;
             oss << std::setw(4) << std::setfill('0') << (now->tm_year + 1900);
             return oss.str();
         }
         auto getMonth(bool returnText = false) -> std::string {
+            time_t t = time(nullptr);
+            tm* now = localtime(&t);
+
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << (now->tm_mon + 1);
 
@@ -210,31 +214,49 @@ namespace rc {
             return oss.str();
         }
         auto getDay() -> std::string {
+            time_t t = time(nullptr);
+            tm* now = localtime(&t);
+
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << now->tm_mday;
             return oss.str();
         }
         auto getHour() -> std::string {
+            time_t t = time(nullptr);
+            tm* now = localtime(&t);
+
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << now->tm_hour;
             return oss.str();
         }
         auto getMinute() -> std::string {
+            time_t t = time(nullptr);
+            tm* now = localtime(&t);
+
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << now->tm_min;
             return oss.str();
         }
         auto getSecond() -> std::string {
+            time_t t = time(nullptr);
+            tm* now = localtime(&t);
+
             std::ostringstream oss;
             oss << std::setw(2) << std::setfill('0') << now->tm_sec;
             return oss.str();
         }
         auto formattedDate(bool returnText = false) -> std::string {
-            if (returnText) return getMonth(true) + " " + getDay() + ", " + getYear(); 
-            return getDay() + "." + getMonth(false) + "." + getYear();
+            std::string day = getDay();
+
+            if (returnText) return getMonth(true) + " " + day + ", " + getYear();
+            return day + "." + getMonth(false) + "." + getYear();
         }
         auto formattedTime(bool showSeconds = true) -> std::string {
-            return getHour() + ":" + getMinute() + (showSeconds ? (":" + getSecond()) : (""));
+            std::string hour = getHour();
+            std::string min = getMinute();
+            std::string sec = getSecond();
+
+            return hour + ":" + min + (showSeconds ? (":" + sec) : (""));
         }
     }
     namespace filesys {
@@ -361,26 +383,6 @@ namespace rc {
         }
     }
     namespace colsys {
-        enum class setcol : uint8_t {
-            p_blue = 0x0001,
-            p_green = 0x0002,
-            p_red = 0x0004,
-            p_light = 0x0008,
-
-
-
-            grey = p_blue | p_green | p_red,
-            red = p_red | p_light,
-            green = p_green | p_light,
-            blue = p_blue | p_light,
-            yellow = p_green | p_red | p_light,
-            orange = p_red | p_green,
-            purple = p_red | p_blue,
-
-            
-            white = 15,
-            reset = 0xFF,
-        };
         namespace colored_cout_impl {
             inline uint16_t getConsoleTextAttr() {
                 CONSOLE_SCREEN_BUFFER_INFO buffer_info;
@@ -451,14 +453,6 @@ namespace rc {
 //auto sourceLoc = std::source_location::current();
 
 //int main() {
-//
-//    rc::logsys::printLog("INFO", rc::colsys::setcol::white, "info log");
-//    Sleep(500);
-//    rc::logsys::printLog("WARNING", rc::colsys::setcol::orange, "warning log");
-//    Sleep(500);
-//    rc::logsys::printLog("ERROR", rc::colsys::setcol::red, "error log");
-//    Sleep(500);
-//    rc::logsys::printLog("GOOD", rc::colsys::setcol::green, "good log");
 //
 //    system("pause");
 //}

@@ -70,7 +70,26 @@ namespace rc {
         template<typename TYPE = uintptr_t> auto read(uintptr_t address) -> TYPE;
     }
     namespace colsys {
-        enum class setcol : uint8_t;
+        enum class setcol : uint8_t {
+            p_blue = 0x0001,
+            p_green = 0x0002,
+            p_red = 0x0004,
+            p_light = 0x0008,
+
+
+
+            grey = p_blue | p_green | p_red,
+            red = p_red | p_light,
+            green = p_green | p_light,
+            blue = p_blue | p_light,
+            yellow = p_green | p_red | p_light,
+            orange = p_red | p_green,
+            purple = p_red | p_blue,
+
+
+            white = 15,
+            reset = 0xFF,
+        };
         namespace colored_cout_impl {
             inline uint16_t getConsoleTextAttr();
             inline void setConsoleTextAttr(const uint16_t attr);
