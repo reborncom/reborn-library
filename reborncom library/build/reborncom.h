@@ -3,6 +3,7 @@
 #include <vector>
 #include <Windows.h>
 #include <cstdint>
+#include <source_location>
 
 
 namespace rc {
@@ -128,6 +129,6 @@ namespace rc {
         auto infoLog(const std::string text) -> void;
         auto warningLog(const std::string text) -> void;
         auto goodLog(const std::string text) -> void;
-        auto errorLog(const std::string text) -> void;
+        auto errorLog(const std::string text, std::source_location loc = std::source_location::current(), bool needloc = 0) -> void;
     }
 }

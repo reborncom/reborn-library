@@ -424,6 +424,7 @@ namespace rc {
     }
     namespace logsys {
         bool first = true;
+        std::source_location loc;
         std::string logPath = strsys::getDesktopPath();
 
         auto setupLogPath(std::string path) -> void {
@@ -435,12 +436,12 @@ namespace rc {
             std::string timeTab = "[" + timesys::formattedTime() + "]";
             std::string tagTab = "[" + tag + "]";
 
-            if (first) { std::cout << std::endl; first = false; }
+            std::cout << std::endl;
 
             if (!filesys::fileExists(filePath)) filesys::fileCreate(filePath);
             filesys::fileWrite(filePath, timeTab + " " + tagTab + " " + text);
 
-            std::cout << timeTab << " " << color << tagTab << " " << colsys::setcol::reset << text << std::endl;
+            std::cout << timeTab << " " << color << tagTab << " " << colsys::setcol::reset << text;
         }
         auto infoLog(const std::string text) -> void {
             rc::logsys::printLog("INFO", rc::colsys::setcol::white, text);
@@ -448,8 +449,13 @@ namespace rc {
         auto warningLog(const std::string text) -> void {
             rc::logsys::printLog("WARNING", rc::colsys::setcol::orange, text);
         }
-        auto errorLog(const std::string text) -> void {
+        auto errorLog(const std::string text, std::source_location loc, bool needloc) -> void {
             rc::logsys::printLog("ERROR", rc::colsys::setcol::red, text);
+
+            if (needloc) {
+                std::cout << colsys::setcol::white << " (" << loc.function_name() << ", " << std::to_string(loc.line()) << ")" << colsys::setcol::reset;
+            }
+
         }
         auto goodLog(const std::string text) -> void {
             rc::logsys::printLog("GOOD", rc::colsys::setcol::green, text);
@@ -457,9 +463,17 @@ namespace rc {
     }
 }
 
-//auto sourceLoc = std::source_location::current();
+
+
 
 //int main() {
+//
+//
+//  
+//    rc::logsys::errorLog("error#1", std::source_location::current(), 0);
+//    rc::logsys::errorLog("error#2", std::source_location::current(), 1);
+//    rc::logsys::errorLog("error#3", std::source_location::current(), 0);
+//
 //
 //    system("pause");
 //}
